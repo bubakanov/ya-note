@@ -17,13 +17,11 @@ class NoteForm(forms.ModelForm):
 
     def clean_slug(self):
         """Обрабатывает случай, если slug не уникален."""
-        cleaned_data = super().clean()
-        slug = cleaned_data.get('slug')
-        if not slug:
-            title = cleaned_data.get('title')
-            slug = slugify(title)[:100]
-        if Note.objects.filter(
+        slug = self.cleaned_data.get('slug')
+
+        if slug and Note.objects.filter(
                 slug=slug
-        ).exclude(id=self.instance.pk).exists():
+        ).exclude(pk=self.instance.pk).exists():
             raise ValidationError(slug + WARNING)
+
         return slug
